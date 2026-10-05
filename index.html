@@ -143,9 +143,9 @@ aside h3{font-size:26px;margin:0}
 </nav>
 <main id="top">
   <div class="hero">
-    <video class="hero-video" id="heroVideo" autoplay loop muted playsinline preload="auto" aria-hidden="true" tabindex="-1">
+    <video class="hero-video" id="heroVideo" autoplay loop muted playsinline webkit-playsinline preload="auto" poster="assets/hero-poster.jpg" aria-hidden="true" tabindex="-1">
+      <source src="assets/hero.mp4" type="video/mp4">
       <source src="https://strvid.nyc3.cdn.digitaloceanspaces.com/cloudinary/flowers_motion_r54og5.webm" type="video/webm">
-      <source src="https://strvid.nyc3.cdn.digitaloceanspaces.com/cloudinary/flowers_motion_r54og5.mp4" type="video/mp4">
     </video>
     <div class="hero-shade" aria-hidden="true"></div>
     <div class="orb" aria-hidden="true"><span></span><span></span><span></span></div>
@@ -385,7 +385,14 @@ draw();
 const navEl=document.querySelector("nav"),heroEl=document.querySelector(".hero");
 const navState=()=>navEl.classList.toggle("on-hero",scrollY<heroEl.offsetHeight-90);
 addEventListener("scroll",navState,{passive:true});addEventListener("resize",navState);navState();
-if(matchMedia("(prefers-reduced-motion:reduce)").matches){const hv=$("#heroVideo");hv&&hv.pause()}
+// hero video: iOS only autoplays muted video, and can still be blocked (Low Power Mode).
+const hv=document.querySelector("#heroVideo");
+if(hv){
+  hv.muted=true;
+  const tryPlay=()=>{const pr=hv.play();pr&&pr.catch&&pr.catch(()=>{})};
+  if(matchMedia("(prefers-reduced-motion:reduce)").matches)hv.pause();
+  else{tryPlay();hv.addEventListener("loadeddata",tryPlay,{once:true});["touchstart","click","scroll"].forEach(ev=>addEventListener(ev,tryPlay,{once:true,passive:true}))}
+}
 </script>
 </body>
 </html>
