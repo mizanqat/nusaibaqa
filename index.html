@@ -8,10 +8,16 @@
 <meta name="description" content="nuvayaQ: abayas, jalabiyas, modest dresses, maternity wear and baby clothing in Qatar. Fill your bag and order on WhatsApp.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%231A1440'/%3E%3Ctext x='32' y='44' font-size='34' font-family='Arial' font-weight='700' text-anchor='middle' fill='%23FF9EC0'%3EQ%3C/text%3E%3C/svg%3E">
 <title>nuvayaQ | Women's and baby clothing, Qatar</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Manrope:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="preload" href="assets/fonts/unbounded-700.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/manrope-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/hero-poster.webp" as="image" type="image/webp" fetchpriority="high">
 <style>
+/* Self-hosted latin subsets: one origin, no render-blocking third-party request. */
+@font-face{font-family:'Unbounded';font-style:normal;font-weight:500;font-display:swap;src:url(assets/fonts/unbounded-500.woff2) format('woff2')}
+@font-face{font-family:'Unbounded';font-style:normal;font-weight:700;font-display:swap;src:url(assets/fonts/unbounded-700.woff2) format('woff2')}
+@font-face{font-family:'Manrope';font-style:normal;font-weight:400;font-display:swap;src:url(assets/fonts/manrope-400.woff2) format('woff2')}
+@font-face{font-family:'Manrope';font-style:normal;font-weight:500;font-display:swap;src:url(assets/fonts/manrope-500.woff2) format('woff2')}
+@font-face{font-family:'Manrope';font-style:normal;font-weight:700;font-display:swap;src:url(assets/fonts/manrope-700.woff2) format('woff2')}
 :root{--bg:#F4F2FB;--ink:#1A1440;--mut:#615C88;--card:rgba(255,255,255,.7);--line:rgba(26,20,64,.12);--a:#8E6BFF;--b:#35D6C4;--c:#FF9EC0;--d:#FFC38A;--btn:#1A1440;--btnt:#fff;
 --disp:'Unbounded','Trebuchet MS',sans-serif;--body:'Manrope','Segoe UI',sans-serif;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#120F2A;--ink:#F1EEFF;--mut:#A9A3D0;--card:rgba(255,255,255,.07);--line:rgba(255,255,255,.14);--btn:#F1EEFF;--btnt:#120F2A}}
@@ -143,9 +149,9 @@ aside h3{font-size:26px;margin:0}
 </nav>
 <main id="top">
   <div class="hero">
-    <video class="hero-video" id="heroVideo" autoplay loop muted playsinline webkit-playsinline preload="auto" poster="assets/hero-poster.jpg" aria-hidden="true" tabindex="-1">
-      <source src="assets/hero.mp4" type="video/mp4">
-      <source src="https://strvid.nyc3.cdn.digitaloceanspaces.com/cloudinary/flowers_motion_r54og5.webm" type="video/webm">
+    <video class="hero-video" id="heroVideo" loop muted playsinline webkit-playsinline preload="none" poster="assets/hero-poster.webp" aria-hidden="true" tabindex="-1">
+      <source data-src="assets/hero.mp4" type="video/mp4">
+      <source data-src="https://strvid.nyc3.cdn.digitaloceanspaces.com/cloudinary/flowers_motion_r54og5.webm" type="video/webm">
     </video>
     <div class="hero-shade" aria-hidden="true"></div>
     <div class="orb" aria-hidden="true"><span></span><span></span><span></span></div>
@@ -385,13 +391,28 @@ draw();
 const navEl=document.querySelector("nav"),heroEl=document.querySelector(".hero");
 const navState=()=>navEl.classList.toggle("on-hero",scrollY<heroEl.offsetHeight-90);
 addEventListener("scroll",navState,{passive:true});addEventListener("resize",navState);navState();
-// hero video: iOS only autoplays muted video, and can still be blocked (Low Power Mode).
+// hero video is kept out of the critical path. The poster paints the hero immediately (it is a
+// still from the same flower footage, so the hand-off reads as one continuous scene), and the
+// 2.4 MB clip is only attached once the page has loaded and gone idle. Visitors who asked for
+// less motion, or who are on a metered / 2G connection, keep the still poster instead.
 const hv=document.querySelector("#heroVideo");
 if(hv){
   hv.muted=true;
-  const tryPlay=()=>{const pr=hv.play();pr&&pr.catch&&pr.catch(()=>{})};
-  if(matchMedia("(prefers-reduced-motion:reduce)").matches)hv.pause();
-  else{tryPlay();hv.addEventListener("loadeddata",tryPlay,{once:true});["touchstart","click","scroll"].forEach(ev=>addEventListener(ev,tryPlay,{once:true,passive:true}))}
+  const still=matchMedia("(prefers-reduced-motion:reduce)");
+  const net=navigator.connection||{};
+  const slow=net.saveData===true||/(^|-)2g$/.test(net.effectiveType||"");
+  const start=()=>{
+    if(still.matches||slow||hv.dataset.started)return;
+    hv.dataset.started="1";
+    [...hv.querySelectorAll("source[data-src]")].forEach(s=>{s.src=s.dataset.src;s.removeAttribute("data-src")});
+    hv.load();
+    const tryPlay=()=>{const pr=hv.play();pr&&pr.catch&&pr.catch(()=>{})};
+    tryPlay();
+    // iOS also autoplays muted video, but Low Power Mode can still block it: retry on first touch.
+    ["touchstart","click"].forEach(ev=>addEventListener(ev,tryPlay,{once:true,passive:true}));
+  };
+  const idle=cb=>typeof window.requestIdleCallback==="function"?window.requestIdleCallback(cb,{timeout:2000}):setTimeout(cb,200);
+  if(document.readyState==="complete")idle(start);else addEventListener("load",()=>idle(start),{once:true});
 }
 </script>
 </body>
