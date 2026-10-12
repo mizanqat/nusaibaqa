@@ -46,7 +46,7 @@ nav a.l:hover{color:var(--ink)}
 @keyframes bump{40%{transform:scale(1.18) rotate(-4deg)}}
 main{position:relative;z-index:1}
 .hero{position:relative;isolation:isolate;--navh:84px;min-height:100vh;min-height:100svh;display:grid;place-items:center;text-align:center;padding:calc(var(--navh) + 40px) 20px 120px;overflow:hidden;background:#79a6d0;color:#fff;margin-top:calc(var(--navh) * -1)}
-.hero-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;z-index:-2}
+.hero-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;z-index:-2}
 .hero-shade{position:absolute;inset:0;z-index:-1;background:linear-gradient(to bottom,rgba(26,20,64,.38),rgba(26,20,64,.26) 50%,rgba(26,20,64,.5))}
 .scroll-ind{position:absolute;bottom:calc(1.6rem + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);z-index:1;display:flex;flex-direction:column;align-items:center;gap:.75rem;color:#fff;text-decoration:none}
 .scroll-icon{width:40px;height:40px;border-radius:50%;border:1px solid rgba(255,255,255,.5);display:grid;place-items:center;transition:background .3s}
@@ -149,10 +149,8 @@ aside h3{font-size:26px;margin:0}
 </nav>
 <main id="top">
   <div class="hero">
-    <video class="hero-video" id="heroVideo" loop muted playsinline webkit-playsinline preload="none" poster="assets/hero-poster.webp" aria-hidden="true" tabindex="-1">
-      <source data-src="assets/hero.mp4" type="video/mp4">
-      <source data-src="https://strvid.nyc3.cdn.digitaloceanspaces.com/cloudinary/flowers_motion_r54og5.webm" type="video/webm">
-    </video>
+    <!-- Background video is unlinked for now: the hero uses the still frame. -->
+    <img class="hero-bg" src="assets/hero-poster.webp" alt="" aria-hidden="true" fetchpriority="high" decoding="async">
     <div class="hero-shade" aria-hidden="true"></div>
     <div class="orb" aria-hidden="true"><span></span><span></span><span></span></div>
     <div class="chip c1">Designed in Doha</div><div class="chip c2">Order on WhatsApp</div><div class="chip c3">Women and baby</div>
@@ -391,29 +389,8 @@ draw();
 const navEl=document.querySelector("nav"),heroEl=document.querySelector(".hero");
 const navState=()=>navEl.classList.toggle("on-hero",scrollY<heroEl.offsetHeight-90);
 addEventListener("scroll",navState,{passive:true});addEventListener("resize",navState);navState();
-// hero video is kept out of the critical path. The poster paints the hero immediately (it is a
-// still from the same flower footage, so the hand-off reads as one continuous scene), and the
-// 2.4 MB clip is only attached once the page has loaded and gone idle. Visitors who asked for
-// less motion, or who are on a metered / 2G connection, keep the still poster instead.
-const hv=document.querySelector("#heroVideo");
-if(hv){
-  hv.muted=true;
-  const still=matchMedia("(prefers-reduced-motion:reduce)");
-  const net=navigator.connection||{};
-  const slow=net.saveData===true||/(^|-)2g$/.test(net.effectiveType||"");
-  const start=()=>{
-    if(still.matches||slow||hv.dataset.started)return;
-    hv.dataset.started="1";
-    [...hv.querySelectorAll("source[data-src]")].forEach(s=>{s.src=s.dataset.src;s.removeAttribute("data-src")});
-    hv.load();
-    const tryPlay=()=>{const pr=hv.play();pr&&pr.catch&&pr.catch(()=>{})};
-    tryPlay();
-    // iOS also autoplays muted video, but Low Power Mode can still block it: retry on first touch.
-    ["touchstart","click"].forEach(ev=>addEventListener(ev,tryPlay,{once:true,passive:true}));
-  };
-  const idle=cb=>typeof window.requestIdleCallback==="function"?window.requestIdleCallback(cb,{timeout:2000}):setTimeout(cb,200);
-  if(document.readyState==="complete")idle(start);else addEventListener("load",()=>idle(start),{once:true});
-}
+// The hero background is a still frame. To bring the video back, restore the <video id="heroVideo">
+// element and re-attach the clip after load + idle, keeping it out of the critical path.
 </script>
 </body>
 </html>
