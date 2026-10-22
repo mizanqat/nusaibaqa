@@ -5,9 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="light dark">
 <meta name="theme-color" content="#79a6d0">
-<meta name="description" content="nuvayaQ: abayas, jalabiyas, modest dresses, maternity wear and baby clothing in Qatar. Fill your bag and order on WhatsApp.">
+<meta name="description" content="NusaibaQA: abayas, jalabiyas, modest dresses, maternity wear and baby clothing in Qatar. Fill your bag and order on WhatsApp.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%231A1440'/%3E%3Ctext x='32' y='44' font-size='34' font-family='Arial' font-weight='700' text-anchor='middle' fill='%23FF9EC0'%3EQ%3C/text%3E%3C/svg%3E">
-<title>nuvayaQ | Women's and baby clothing, Qatar</title>
+<title>NusaibaQA | Women's and baby clothing, Qatar</title>
 <link rel="preload" href="assets/fonts/unbounded-700.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/fonts/manrope-400.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/hero-poster.webp" as="image" type="image/webp" fetchpriority="high">
@@ -41,6 +41,11 @@ nav .links{display:flex;gap:22px}
 nav a.l{color:var(--mut);text-decoration:none;font-weight:500;font-size:15px}
 nav a.l:hover{color:var(--ink)}
 .bag{position:relative;display:flex;align-items:center;gap:8px;padding:10px 18px;border-radius:999px;background:var(--btn);color:var(--btnt);font-weight:700;font-size:15px}
+.nav-actions{display:flex;align-items:center;gap:8px;flex:none}
+.theme-toggle{width:42px;height:42px;flex:none;display:grid;place-items:center;border:1px solid var(--line);border-radius:50%;background:var(--card);color:var(--ink);transition:transform .2s,background .2s,border-color .2s}
+.theme-toggle:hover{transform:rotate(12deg)}
+.theme-toggle svg{width:19px;height:19px}
+nav.on-hero .theme-toggle{background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.45);color:#fff}
 .bag b{min-width:22px;height:22px;border-radius:11px;background:linear-gradient(135deg,var(--b),var(--a));color:#10122e;display:grid;place-items:center;font-size:12px}
 .bump{animation:bump .5s}
 @keyframes bump{40%{transform:scale(1.18) rotate(-4deg)}}
@@ -143,9 +148,12 @@ aside h3{font-size:26px;margin:0}
 <body>
 <div class="glow" id="glow"></div>
 <nav>
-  <a class="logo" href="#top">nuvaya<i>Q</i></a>
+  <a class="logo" href="#top">Nusaiba<i>QA</i></a>
   <div class="links"><a class="l" href="#shop" data-go="w">Women</a><a class="l" href="#shop" data-go="b">Baby</a><a class="l" href="#how">How to order</a></div>
-  <button class="bag" id="bagBtn" aria-label="Open bag">Bag <b id="cnt">0</b></button>
+  <div class="nav-actions">
+    <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch to dark theme" title="Switch to dark theme" aria-pressed="false"><svg id="themeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"/></svg></button>
+    <button class="bag" id="bagBtn" aria-label="Open bag">Bag <b id="cnt">0</b></button>
+  </div>
 </nav>
 <main id="top">
   <div class="hero">
@@ -155,7 +163,7 @@ aside h3{font-size:26px;margin:0}
     <div class="orb" aria-hidden="true"><span></span><span></span><span></span></div>
     <div class="chip c1">Designed in Doha</div><div class="chip c2">Order on WhatsApp</div><div class="chip c3">Women and baby</div>
     <div class="hc">
-      <h1 class="word" id="word" aria-label="nuvayaQ"></h1>
+      <h1 class="word" id="word" aria-label="NusaibaQA"></h1>
       <h2>Clothing for her, and for the little ones.</h2>
       <p>Abayas, jalabiyas, dresses, hijabs and maternity wear for her — bodysuits, rompers, swaddles and gift sets for baby. Fill your bag, then send your order on WhatsApp.</p>
       <div class="cta"><a class="btn" href="#shop" data-go="w">Shop women</a><a class="btn g" href="#shop" data-go="b">Shop baby</a></div>
@@ -183,7 +191,7 @@ aside h3{font-size:26px;margin:0}
     </div>
   </section>
 </main>
-<footer><a class="logo" href="#top">nuvaya<i>Q</i></a><p>Women's and baby clothing, Qatar.</p><p><a href="#" id="fwa" target="_blank" rel="noopener" style="color:inherit">Chat with us on WhatsApp</a></p></footer>
+<footer><a class="logo" href="#top">Nusaiba<i>QA</i></a><p>Women's and baby clothing, Qatar.</p><p><a href="#" id="fwa" target="_blank" rel="noopener" style="color:inherit">Chat with us on WhatsApp</a></p></footer>
 
 <div class="shade" id="shade"></div>
 <aside id="drawer" aria-label="Shopping bag" inert>
@@ -304,7 +312,7 @@ const bg=p=>`background:linear-gradient(145deg,${p.k[0]}55,${p.k[1]}44)`;
 const shot=(p)=>`<img class="ph" src="${p.img}" alt="${p.n}" loading="lazy" decoding="async" onerror="this.remove()">`;
 
 // hero wordmark: one orchestrated entrance
-$("#word").innerHTML=[..."nuvayaQ"].map((c,i)=>`<span class="ch" style="--i:${i}" aria-hidden="true">${c}</span>`).join("");
+$("#word").innerHTML=[..."NusaibaQA"].map((c,i)=>`<span class="ch" style="--i:${i}" aria-hidden="true">${c}</span>`).join("");
 $("#mq").innerHTML=Array(4).fill(["Abayas","Jalabiyas","Kaftans","Modest dresses","Tops & tunics","Scarves & hijabs","Maternity","Baby bodysuits","Rompers","Sleepsuits","Baby frocks","Swaddles","Gift sets"].map(t=>`<span>${t}</span><em>✦</em>`).join("")).join("");
 
 // products
@@ -378,14 +386,21 @@ $("#send").onclick=()=>{
   if(!n||!a){$("#err").textContent="Please add your name and delivery address.";return}
   $("#err").textContent="";
   const lines=cart.map(x=>`• ${x.q} x ${P[x.id].n} (${szL(x.size)}) - ${fmt(P[x.id].p*x.q)}`).join("\n");
-  const msg=`Hello nuvayaQ! I would like to place an order:\n\n${lines}\n\nTotal: ${fmt(total())}\n\nName: ${n}${ph?"\nMobile: "+ph:""}\nDelivery: ${a}`;
+  const msg=`Hello NusaibaQA! I would like to place an order:\n\n${lines}\n\nTotal: ${fmt(total())}\n\nName: ${n}${ph?"\nMobile: "+ph:""}\nDelivery: ${a}`;
   const u=`https://wa.me/${WA}?text=${encodeURIComponent(msg)}`;
   $("#fbl").href=u;$("#fb").style.display="block";
   window.open(u,"_blank");
   toast("Opening WhatsApp");
 };
-$("#fwa").href=`https://wa.me/${WA}?text=${encodeURIComponent("Hello nuvayaQ!")}`;
+$("#fwa").href=`https://wa.me/${WA}?text=${encodeURIComponent("Hello NusaibaQA!")}`;
 draw();
+const themeBtn=$("#themeToggle"),themeIcon=$("#themeIcon"),themeKey="nusaibaqa-theme";
+const moonIcon='<path d="M20.9 13A9 9 0 0 1 11 3.1 9 9 0 1 0 20.9 13Z"/>';
+const sunIcon='<circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"/>';
+function setTheme(mode,remember=false){document.documentElement.dataset.theme=mode;const dark=mode==="dark",next=dark?"light":"dark";themeBtn.setAttribute("aria-pressed",String(dark));themeBtn.setAttribute("aria-label",`Switch to ${next} theme`);themeBtn.title=`Switch to ${next} theme`;themeIcon.innerHTML=dark?sunIcon:moonIcon;if(remember){try{localStorage.setItem(themeKey,mode)}catch(e){}}}
+let savedTheme=null;try{savedTheme=localStorage.getItem(themeKey)}catch(e){}
+setTheme(savedTheme==="light"||savedTheme==="dark"?savedTheme:(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"));
+themeBtn.addEventListener("click",()=>setTheme(document.documentElement.dataset.theme==="dark"?"light":"dark",true));
 const navEl=document.querySelector("nav"),heroEl=document.querySelector(".hero");
 const navState=()=>navEl.classList.toggle("on-hero",scrollY<heroEl.offsetHeight-90);
 addEventListener("scroll",navState,{passive:true});addEventListener("resize",navState);navState();
